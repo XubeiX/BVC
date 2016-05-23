@@ -3,4 +3,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="thumbnail_default">132dp</dimen>
+    <dimen name="card_place">3dp</dimen>
+    <dimen name="card_radius_corner">16dp</dimen>
+    <dimen name="space_between_cards">10dp</dimen>
 </resources>
