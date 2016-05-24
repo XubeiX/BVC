@@ -15,7 +15,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
+
+import ratajczak.artur.bvc.RV.ArticleModel;
 
 /**
  * Created by Artur Ratajczak on 23.05.16.
@@ -34,9 +35,11 @@ public class JsonParser extends AsyncTask<String, Void, String>{
     private static final String TAG_TITLE = "title";
     private static final String TAG_ABSTRACT = "abstract";
     private static final String TAG_THUMBNAIL = "thumbnail";
+    private static final String TAG_ARTICLE_URL = "url";
 
     public interface JsonParserResponse{
-        void processFinish(List<ArticleModel> articleModels);
+        void processFinish(ArticleModel articleModels);
+
     }
 
 
@@ -103,22 +106,18 @@ public class JsonParser extends AsyncTask<String, Void, String>{
 
     @Override
     protected void onPostExecute(String result) {
-        List<ArticleModel> articleModels = new ArrayList<>();
         try {
-           //JSONArray jsonArray = new JSONArray(result);
-
             JSONObject jsonObject = new JSONObject(result);
             JSONArray jsonArray = jsonObject.getJSONArray(TAG_ARRAY_ITEMS);
             for (int i = 0; i<jsonArray.length(); i++){
                 String title = jsonArray.getJSONObject(i).getString(TAG_TITLE);
                 String abst = jsonArray.getJSONObject(i).getString(TAG_ABSTRACT);
                 String thumbnail = jsonArray.getJSONObject(i).getString(TAG_THUMBNAIL);
+                String articleUrl = jsonArray.getJSONObject(i).getString(TAG_ARTICLE_URL);
 
-                articleModels.add(new ArticleModel(title,abst,thumbnail));
-
+                ArticleModel model = new ArticleModel(title,abst,thumbnail,articleUrl);
+                delegate.processFinish(model);
             }
-
-            delegate.processFinish(articleModels);
         }catch (JSONException e){
             Log.e(TAG,e.getMessage());
             e.printStackTrace();

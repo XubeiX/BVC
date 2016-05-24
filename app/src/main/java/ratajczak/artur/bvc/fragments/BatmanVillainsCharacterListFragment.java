@@ -1,11 +1,17 @@
-package layout;
+package ratajczak.artur.bvc.fragments;
 
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -15,23 +21,26 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ratajczak.artur.bvc.ArticleModel;
-import ratajczak.artur.bvc.ArticleRVAdapter;
+import ratajczak.artur.bvc.DetailActivity;
+import ratajczak.artur.bvc.RV.ArticleItemViewHolder;
+import ratajczak.artur.bvc.RV.ArticleModel;
+import ratajczak.artur.bvc.RV.ArticleRVAdapter;
 import ratajczak.artur.bvc.JsonParser;
 import ratajczak.artur.bvc.R;
 
 /**
  * Created by Artur Ratajczak on 23.05.16.
  */
-public class BatmanVillainsCharacterListFragment extends Fragment implements SearchView.OnQueryTextListener{
+public class BatmanVillainsCharacterListFragment extends Fragment implements SearchView.OnQueryTextListener,JsonParser.JsonParserResponse, ArticleItemViewHolder.ViewHolderClicks{
     private RecyclerView recyclerView;
     private List<ArticleModel> articleModelList;
     private ArticleRVAdapter adapter;
-
+    private boolean sortedAlphabetically = false;
     public BatmanVillainsCharacterListFragment() {
         // Required empty public constructor
     }
@@ -44,26 +53,38 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
         View view = inflater.inflate(R.layout.fragment_batman_villains_character_list, container, false);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
 
+        articleModelList = new ArrayList<>();
+
         recyclerView = (RecyclerView)view.findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
+
         return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        AsyncTask JsonParser = new JsonParser(new JsonParser.JsonParserResponse() {
-            @Override
-            public void processFinish(List<ArticleModel> articleModels) {
-                articleModelList = articleModels;
-                adapter.setFilter(articleModelList);
-            }
-        }).execute("test");
+
+        if(isNetworkConnected()){
+            AsyncTask JsonParser = new JsonParser(this).execute();
+
+        }else{
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Error")
+                    .setMessage("No Internet access")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // continue with delete
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
 
         //TODO: in this place download data from server and store it in ArrayList "articleModelList" and create adapter
 
-        adapter = new ArticleRVAdapter(articleModelList);
+        adapter = new ArticleRVAdapter(articleModelList, this);
         recyclerView.setAdapter(adapter);
     }
 
@@ -90,6 +111,23 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
                         return true; // Return true to expand action view
                     }
                 });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_sort :
+                if(!sortedAlphabetically){
+                    adapter.sortAlphabetically();
+                    sortedAlphabetically = true;
+                    }else{
+                    adapter.reverseOrder();
+                    sortedAlphabetically = false;
+                }
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -120,5 +158,30 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
         return filteredList;
     }
 
+    private boolean isNetworkConnected(){
+        ConnectivityManager cm = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null;
+    }
 
+
+    @Override
+    public void processFinish(ArticleModel articleModels) {
+        articleModelList.add(articleModels);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onCardClick(View v) {
+        int pos = recyclerView.getChildAdapterPosition(v);
+        ArticleModel model = adapter.getArticleModeAt(pos);
+
+        Intent intent = new Intent(getActivity(), DetailActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString(DetailCharacterFragment.BUNDLE_TITLE_TAG, model.getTitle());
+        bundle.putString(DetailCharacterFragment.BUNDLE_ABSTRACT_TAG,model.getAbst());
+        intent.putExtras(bundle);
+        startActivity(intent);
+
+        Toast.makeText(getContext(),String.valueOf(pos),Toast.LENGTH_LONG).show();
+    }
 }

@@ -3,14 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ratajczak.artur.bvc.MainActivity">
+    tools:context="ratajczak.artur.bvc.DetailActivity">
 
     <fragment
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="ratajczak.artur.bvc.fragments.BatmanVillainsCharacterListFragment"
-        android:id="@+id/BVCFragment"
+        android:name="ratajczak.artur.bvc.fragments.DetailCharacterFragment"
+        android:id="@+id/DetailFragment"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        tools:layout="@layout/fragment_batman_villains_character_list" />
+        tools:layout="@layout/fragment_detail_character" />
 </RelativeLayout>

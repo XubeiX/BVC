@@ -6,4 +6,5 @@
     <dimen name="card_place">3dp</dimen>
     <dimen name="card_radius_corner">16dp</dimen>
     <dimen name="space_between_cards">10dp</dimen>
+    <dimen name="thumbnail_detail">250dp</dimen>
 </resources>
