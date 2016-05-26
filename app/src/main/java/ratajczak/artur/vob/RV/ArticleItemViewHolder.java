@@ -1,32 +1,27 @@
-package ratajczak.artur.bvc.RV;
+package ratajczak.artur.vob.RV;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.squareup.picasso.Picasso;
 
 import ratajczak.artur.bvc.R;
-import ratajczak.artur.bvc.utils.DownloadThumbnailTask;
 
 /**
  * Created by Artur Ratajczak on 23.05.16.
  */
 public class ArticleItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-    private final int MAXABSTRACTLENGTH = 80;
+    private final int MAXABSTRACTLENGTH = 40;
+    private final int MAXABSTRACTWORDS = 7;
     
     private TextView article_title;
     private TextView article_abstract;
     private ImageView thumbnail;
     private ViewHolderClicks mListener;
+    private Context context;
 
     public static interface ViewHolderClicks{
         void onCardClick(View v);
@@ -34,6 +29,7 @@ public class ArticleItemViewHolder extends RecyclerView.ViewHolder implements Vi
 
     public ArticleItemViewHolder(final View itemView, ViewHolderClicks listener) {
         super(itemView);
+        context = itemView.getContext();
         mListener = listener;
         article_title = (TextView)itemView.findViewById(R.id.article_title);
         article_abstract = (TextView)itemView.findViewById(R.id.atricle_abstract);
@@ -49,13 +45,21 @@ public class ArticleItemViewHolder extends RecyclerView.ViewHolder implements Vi
     public void bind(ArticleModel articleModel){
         article_title.setText(articleModel.getTitle());
         try{
-        article_abstract.setText(articleModel.getAbst().substring(0,MAXABSTRACTLENGTH)+"...");
-        }catch (StringIndexOutOfBoundsException e){
+            article_abstract.setText(getNFirstWords(articleModel.getAbst(),MAXABSTRACTWORDS));
+        }catch (Exception e){
             article_abstract.setText(articleModel.getAbst());
         }
-        new DownloadThumbnailTask(thumbnail).execute(articleModel.getThumbnailUrl());
+        Picasso.with(context).load(articleModel.getThumbnailUrl()).error(R.drawable.batman).into(thumbnail);
 
+    }
 
+    private String getNFirstWords(String sentense, int n){
+        String[] words = sentense.split("\\s+");
+        StringBuffer sb = new StringBuffer();
+        for(int i =0; i < n; i++){
+            sb.append(words[i]+" ");
+        }
+        return sb.toString()+"...";
     }
 
 }

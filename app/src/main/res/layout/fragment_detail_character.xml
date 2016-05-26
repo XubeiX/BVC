@@ -40,6 +40,7 @@
             android:paddingTop="@dimen/space_between_cards"
             android:textAppearance="?android:attr/textAppearanceMedium"
             tools:text="Abstract"
+            android:gravity="center"
             android:layout_weight="5"
             android:id="@+id/atricle_abstract_detail" />
     </LinearLayout>

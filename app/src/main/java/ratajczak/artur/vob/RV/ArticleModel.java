@@ -1,6 +1,4 @@
-package ratajczak.artur.bvc.RV;
-
-import android.graphics.Bitmap;
+package ratajczak.artur.vob.RV;
 
 /**
  * Created by Artur Ratajczak on 23.05.16.
@@ -11,6 +9,11 @@ public class ArticleModel implements Comparable<ArticleModel> {
     private String thumbnailUrl;
     private String articleURL;
 
+
+    public ArticleModel(String title, String abst){
+        this.title = title;
+        this.abst = abst;
+    }
 
     public ArticleModel(String title, String abst, String thumbnailUrl, String articleUrl) {
         this.title = title;

@@ -1,4 +1,4 @@
-package ratajczak.artur.bvc;
+package ratajczak.artur.vob;
 
 import org.junit.Test;
 

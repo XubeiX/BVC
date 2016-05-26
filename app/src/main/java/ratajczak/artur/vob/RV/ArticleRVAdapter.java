@@ -1,4 +1,4 @@
-package ratajczak.artur.bvc.RV;
+package ratajczak.artur.vob.RV;
 
 
 import android.support.v7.widget.RecyclerView;

@@ -1,4 +1,4 @@
-package ratajczak.artur.bvc.fragments;
+package ratajczak.artur.vob.fragments;
 
 
 import android.app.Activity;
@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,10 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-import ratajczak.artur.bvc.RV.ArticleItemViewHolder;
-import ratajczak.artur.bvc.RV.ArticleModel;
-import ratajczak.artur.bvc.RV.ArticleRVAdapter;
-import ratajczak.artur.bvc.utils.JsonParser;
+import ratajczak.artur.vob.RV.ArticleItemViewHolder;
+import ratajczak.artur.vob.RV.ArticleModel;
+import ratajczak.artur.vob.RV.ArticleRVAdapter;
+import ratajczak.artur.vob.utils.JsonParser;
 import ratajczak.artur.bvc.R;
 
 /**
@@ -65,7 +66,6 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
         recyclerView = (RecyclerView)view.findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
-
         return view;
     }
 
@@ -74,8 +74,7 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
         setHasOptionsMenu(true);
 
         if(isNetworkConnected()){
-            AsyncTask JsonParser = new JsonParser(this).execute();
-
+            AsyncTask jsonParser = new JsonParser(this).execute();
         }else{
             new AlertDialog.Builder(getContext())
                     .setTitle("Error")
@@ -91,6 +90,7 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
         adapter = new ArticleRVAdapter(articleModelList, this);
         recyclerView.setAdapter(adapter);
     }
+
 
     @Override
     public void onAttach(Context context) {
@@ -145,6 +145,10 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
                     adapter.reverseOrder();
                     sortedAlphabetically = false;
                 }
+                return true;
+            case R.id.menu_refresh :
+                articleModelList.clear();
+                AsyncTask jsonParser = new JsonParser(this).execute();
                 return true;
         }
 

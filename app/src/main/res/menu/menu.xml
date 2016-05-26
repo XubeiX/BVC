@@ -14,5 +14,10 @@
         android:title="@string/action_sort"
         app:showAsAction="ifRoom|withText"
         />
+    <item
+        android:id="@+id/menu_refresh"
+        android:icon="@android:drawable/ic_popup_sync"
+        android:title="Refresh"
+        app:showAsAction="always"/>
 
 </menu>

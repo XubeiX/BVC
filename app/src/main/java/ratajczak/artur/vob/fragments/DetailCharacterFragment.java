@@ -1,11 +1,10 @@
-package ratajczak.artur.bvc.fragments;
+package ratajczak.artur.vob.fragments;
 
 
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 
 import android.support.v4.app.Fragment;
@@ -16,10 +15,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.net.URL;
+import com.squareup.picasso.Picasso;
 
 import ratajczak.artur.bvc.R;
-import ratajczak.artur.bvc.utils.DownloadThumbnailTask;
 
 
 /**
@@ -61,9 +59,17 @@ public class DetailCharacterFragment extends Fragment implements View.OnClickLis
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         bundle = getArguments();
-        title.setText(bundle.getString(BUNDLE_TITLE_TAG));
-        abst.setText(bundle.getString(BUNDLE_ABSTRACT_TAG));
-        new DownloadThumbnailTask(thumbnail).execute(bundle.getString(BUNDLE_THUMBNAIL_URL));
+        if(bundle!=null) {
+            title.setText(bundle.getString(BUNDLE_TITLE_TAG));
+            abst.setText(bundle.getString(BUNDLE_ABSTRACT_TAG));
+            if((bundle.getString(BUNDLE_THUMBNAIL_URL) == null || bundle.getString(BUNDLE_ARTICLE_URL) == null)) {
+                Picasso.with(view.getContext()).load(R.drawable.batman).into(thumbnail);
+                readMoreBtn.setVisibility(View.INVISIBLE);
+            }else{
+                Picasso.with(view.getContext()).load(bundle.getString(BUNDLE_THUMBNAIL_URL)).error(R.drawable.batman).into(thumbnail);
+                readMoreBtn.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     @Override

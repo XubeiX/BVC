@@ -1,4 +1,4 @@
-package ratajczak.artur.bvc.utils;
+package ratajczak.artur.vob.utils;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -16,12 +16,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import ratajczak.artur.bvc.RV.ArticleModel;
+import ratajczak.artur.vob.RV.ArticleModel;
 
 /**
  * Created by Artur Ratajczak on 23.05.16.
  */
 public class JsonParser extends AsyncTask<String, Void, String>{
+
+    public interface JsonParserResponse{
+        void processFinish(ArticleModel articleModels);
+
+    }
+
     private static final String TAG = "JsonParser";
 
     //base url
@@ -37,17 +43,8 @@ public class JsonParser extends AsyncTask<String, Void, String>{
     private static final String TAG_THUMBNAIL = "thumbnail";
     private static final String TAG_ARTICLE_URL = "url";
 
-    public interface JsonParserResponse{
-        void processFinish(ArticleModel articleModels);
-
-    }
-
-
     private String urlToParse;
-    private InputStream inputStream;
     private JsonParserResponse delegate;
-    private StringBuilder JsonString;
-
 
     public JsonParser(JsonParserResponse delegate){
         this.delegate = delegate;
@@ -55,14 +52,9 @@ public class JsonParser extends AsyncTask<String, Void, String>{
     }
 
     @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-    }
-
-    @Override
     protected String doInBackground(String... params) {
-
-        ArrayList<ArticleModel> articles = new ArrayList<>();
+        InputStream inputStream;
+        StringBuilder JsonString = new StringBuilder();
 
         try {
             URL url = new URL(urlToParse);
@@ -78,7 +70,6 @@ public class JsonParser extends AsyncTask<String, Void, String>{
             try{
 
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"utf-8"));
-                JsonString = new StringBuilder();
 
                 String line;
                 while((line = bufferedReader.readLine()) != null){
@@ -110,17 +101,44 @@ public class JsonParser extends AsyncTask<String, Void, String>{
             JSONObject jsonObject = new JSONObject(result);
             JSONArray jsonArray = jsonObject.getJSONArray(TAG_ARRAY_ITEMS);
             for (int i = 0; i<jsonArray.length(); i++){
-                String title = jsonArray.getJSONObject(i).getString(TAG_TITLE);
+                /*String title = jsonArray.getJSONObject(i).getString(TAG_TITLE);
                 String abst = jsonArray.getJSONObject(i).getString(TAG_ABSTRACT);
                 String thumbnail = jsonArray.getJSONObject(i).getString(TAG_THUMBNAIL);
                 String articleUrl = jsonArray.getJSONObject(i).getString(TAG_ARTICLE_URL);
 
                 ArticleModel model = new ArticleModel(title,abst,thumbnail,articleUrl);
-                delegate.processFinish(model);
+                delegate.processFinish(model);*/
+                new parseJSON().execute(jsonArray.getJSONObject(i));
             }
         }catch (JSONException e){
             Log.e(TAG,e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private class parseJSON extends AsyncTask<JSONObject,Void,ArticleModel>{
+
+        @Override
+        protected ArticleModel doInBackground(JSONObject... params) {
+            ArticleModel model = null;
+            try {
+                JSONObject object = params[0];
+                String title = object.getString(TAG_TITLE);
+                String abst = object.getString(TAG_ABSTRACT);
+                String thumbnail = object.getString(TAG_THUMBNAIL);
+                String articleUrl = object.getString(TAG_ARTICLE_URL);
+                model = new ArticleModel(title,abst,thumbnail,articleUrl);
+            }catch (JSONException e){
+                Log.e(TAG,e.getMessage());
+                e.printStackTrace();
+            }
+            return model;
+        }
+
+        @Override
+        protected void onPostExecute(ArticleModel articleModel) {
+            if(articleModel!=null)
+                delegate.processFinish(articleModel);
         }
     }
 }

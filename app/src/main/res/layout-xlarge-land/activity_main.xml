@@ -3,22 +3,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     tools:context="ratajczak.artur.vob.MainActivity">
 
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:id="@+id/DetailsFragment"
-        android:layout_weight="1"
-        />
     <fragment
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:name="ratajczak.artur.vob.fragments.BatmanVillainsCharacterListFragment"
         android:id="@+id/BVCFragment"
         android:layout_weight="1"
         tools:layout="@layout/fragment_batman_villains_character_list" />
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:id="@+id/DetailsFragment"
+        android:layout_weight="1"
+        />
+
 
 </LinearLayout>

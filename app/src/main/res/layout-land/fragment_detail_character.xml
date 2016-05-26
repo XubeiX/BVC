@@ -15,14 +15,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_gravity="center">
 
         <ImageView
             android:id="@+id/thumbnail_detail"
             android:layout_width="@dimen/thumbnail_detail"
             android:layout_height="@dimen/thumbnail_detail"
             android:layout_weight="1"
-            android:layout_gravity="left"
+            android:layout_gravity="center"
             tools:src="@drawable/batman"
             android:contentDescription="@string/thumbnail"/>
         <LinearLayout
