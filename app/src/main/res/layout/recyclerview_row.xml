@@ -10,7 +10,6 @@
     android:foreground="?android:attr/selectableItemBackground"
     android:clickable="true"
     xmlns:tools="http://schemas.android.com/tools">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,7 +21,6 @@
         android:layout_gravity="center"
         tools:src="@drawable/batman"
         android:contentDescription="@string/thumbnail"/>
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,15 +32,19 @@
             android:layout_height="match_parent"
             android:textAppearance="?android:attr/textAppearanceLarge"
             tools:text="Title"
-            android:id="@+id/article_title" />
-
+            android:id="@+id/article_title"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textAppearance="?android:attr/textAppearanceMedium"
             tools:text="Abstract"
-            android:id="@+id/atricle_abstract" />
+            android:id="@+id/article_abstract"
+            android:maxLines="3" />
+        <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/like"
+            android:id="@+id/like" />
     </LinearLayout>
     </LinearLayout>
-
 </android.support.v7.widget.CardView>

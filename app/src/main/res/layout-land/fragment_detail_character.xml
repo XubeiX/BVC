@@ -17,7 +17,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_gravity="center">
-
         <ImageView
             android:id="@+id/thumbnail_detail"
             android:layout_width="@dimen/thumbnail_detail"
@@ -41,7 +40,14 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:gravity="center"
             tools:text="Title"
-            android:id="@+id/article_title_detail" />
+            android:id="@+id/article_title_detail"/>
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/liked"
+                android:id="@+id/liked_detail"
+                android:layout_gravity="center"
+                android:clickable="false"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -51,8 +57,8 @@
             android:paddingRight="@dimen/space_between_cards"
             android:textAppearance="?android:attr/textAppearanceMedium"
             tools:text="Abstract"
-            android:id="@+id/atricle_abstract_detail" />
-    </LinearLayout>
+            android:id="@+id/article_abstract_detail"/>
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
     <Button
@@ -62,5 +68,5 @@
         android:id="@+id/ReadMoreButton"
         android:layout_gravity="bottom"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"/>
 </RelativeLayout>

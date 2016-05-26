@@ -2,13 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ratajczak.artur.vob.fragments.BatmanVillainsCharacterListFragment">
-
-    <!-- TODO: Update blank fragment layout -->
+    tools:context="ratajczak.artur.vob.fragments.VillainsOfBatmanListFragment">
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        />
+        android:scrollbars="vertical"/>
 </LinearLayout>

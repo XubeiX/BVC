@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,7 +22,7 @@ import ratajczak.artur.bvc.R;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by Artur Ratajczak on 23.05.16.
  */
 public class DetailCharacterFragment extends Fragment implements View.OnClickListener{
 
@@ -31,28 +32,29 @@ public class DetailCharacterFragment extends Fragment implements View.OnClickLis
     public static final String BUNDLE_ABSTRACT_TAG = "abstract";
     public static final String BUNDLE_ARTICLE_URL = "url";
     public static final String BUNDLE_THUMBNAIL_URL = "thumbnailURL";
+    public static final String BUNDLE_LIKED_TAG = "liked";
 
     private TextView title;
     private TextView abst;
     private ImageView thumbnail;
     private Button readMoreBtn;
     private Bundle bundle;
+    private CheckBox liked;
 
     public DetailCharacterFragment() {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail_character, container, false);
-
         title = (TextView)view.findViewById(R.id.article_title_detail);
-        abst = (TextView)view.findViewById(R.id.atricle_abstract_detail);
+        abst = (TextView)view.findViewById(R.id.article_abstract_detail);
         thumbnail = (ImageView)view.findViewById(R.id.thumbnail_detail);
         readMoreBtn = (Button)view.findViewById(R.id.ReadMoreButton);
         readMoreBtn.setOnClickListener(this);
+        liked = (CheckBox)view.findViewById(R.id.liked_detail);
         return view;
     }
 
@@ -62,6 +64,7 @@ public class DetailCharacterFragment extends Fragment implements View.OnClickLis
         if(bundle!=null) {
             title.setText(bundle.getString(BUNDLE_TITLE_TAG));
             abst.setText(bundle.getString(BUNDLE_ABSTRACT_TAG));
+            liked.setChecked(bundle.getBoolean(BUNDLE_LIKED_TAG));
             if((bundle.getString(BUNDLE_THUMBNAIL_URL) == null || bundle.getString(BUNDLE_ARTICLE_URL) == null)) {
                 Picasso.with(view.getContext()).load(R.drawable.batman).into(thumbnail);
                 readMoreBtn.setVisibility(View.INVISIBLE);

@@ -11,30 +11,32 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
-import java.util.ArrayList;
 
 import ratajczak.artur.vob.RV.ArticleModel;
 
 /**
  * Created by Artur Ratajczak on 23.05.16.
  */
+
 public class JsonParser extends AsyncTask<String, Void, String>{
 
     public interface JsonParserResponse{
-        void processFinish(ArticleModel articleModels);
+        void taskFinished(ArticleModel articleModels);
 
     }
 
     private static final String TAG = "JsonParser";
 
     //base url
-    private static String URL = "http://batman.wikia.com/api/v1/Articles/Top?expand=1";
+    private static final String URL = "http://batman.wikia.com/api/v1/Articles/Top?expand=1";
     //urs parameters
-    private static String CATEGORY = "&category=Villains";
-    private static String LIMIT = "&limit=50";
+    private static final String CATEGORY = "&category=Villains";
+    private static final String LIMIT = "&limit=50";
 
     //JSON node name
     private static final String TAG_ARRAY_ITEMS = "items";
@@ -42,9 +44,10 @@ public class JsonParser extends AsyncTask<String, Void, String>{
     private static final String TAG_ABSTRACT = "abstract";
     private static final String TAG_THUMBNAIL = "thumbnail";
     private static final String TAG_ARTICLE_URL = "url";
+    private static final String TAG_ID = "id";
 
-    private String urlToParse;
-    private JsonParserResponse delegate;
+    private final String urlToParse;
+    private final JsonParserResponse delegate;
 
     public JsonParser(JsonParserResponse delegate){
         this.delegate = delegate;
@@ -64,34 +67,18 @@ public class JsonParser extends AsyncTask<String, Void, String>{
             urlConnection.setDoInput(true);
             urlConnection.addRequestProperty("Content-Type","application/json; charset=utf-8");
             urlConnection.connect();
-
             inputStream = urlConnection.getInputStream();
 
-            try{
-
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"utf-8"));
-
-                String line;
-                while((line = bufferedReader.readLine()) != null){
-                    JsonString.append(line+"\n");
-                }
-
-                inputStream.close();
-
-            }catch (Exception e){
-                Log.e(TAG,e.getMessage());
-                e.printStackTrace();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"utf-8"));
+            String line;
+            while((line = bufferedReader.readLine()) != null){
+                JsonString.append(line).append("\n");
             }
-
-            inputStream.close();
-
-        }catch (MalformedURLException e){
-            Log.e(TAG,e.getMessage());
-            e.printStackTrace();
         }catch (IOException e){
             Log.e(TAG,e.getMessage());
             e.printStackTrace();
         }
+
         return JsonString.toString();
     }
 
@@ -127,7 +114,8 @@ public class JsonParser extends AsyncTask<String, Void, String>{
                 String abst = object.getString(TAG_ABSTRACT);
                 String thumbnail = object.getString(TAG_THUMBNAIL);
                 String articleUrl = object.getString(TAG_ARTICLE_URL);
-                model = new ArticleModel(title,abst,thumbnail,articleUrl);
+                int ID = object.getInt(TAG_ID);
+                model = new ArticleModel(ID,title,abst,thumbnail,articleUrl);
             }catch (JSONException e){
                 Log.e(TAG,e.getMessage());
                 e.printStackTrace();
@@ -138,7 +126,7 @@ public class JsonParser extends AsyncTask<String, Void, String>{
         @Override
         protected void onPostExecute(ArticleModel articleModel) {
             if(articleModel!=null)
-                delegate.processFinish(articleModel);
+                delegate.taskFinished(articleModel);
         }
     }
 }

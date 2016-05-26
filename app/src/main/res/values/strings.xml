@@ -6,5 +6,8 @@
     <string name="readMoreButton">Read more on Wiki</string>
     <string name="detailsFragmentWelcom">Villains of Batman</string>
     <string name="detailsFragmentAbstract">Choose a character from the list.</string>
+    <string name="like">Like</string>
+    <string name="liked">Liked</string>
+    <string name="refresh">Refresh</string>
 
 </resources>

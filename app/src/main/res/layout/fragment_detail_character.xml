@@ -26,6 +26,13 @@
             tools:text="Title"
             android:layout_weight="1"
             android:id="@+id/article_title_detail" />
+        <android.support.v7.widget.AppCompatCheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/liked_detail"
+            android:text="@string/liked"
+            android:layout_gravity="center"
+            android:clickable="false"/>
         <ImageView
             android:id="@+id/thumbnail_detail"
             android:layout_width="@dimen/thumbnail_detail"
@@ -42,9 +49,8 @@
             tools:text="Abstract"
             android:gravity="center"
             android:layout_weight="5"
-            android:id="@+id/atricle_abstract_detail" />
+            android:id="@+id/article_abstract_detail"/>
     </LinearLayout>
-
 </ScrollView>
     <Button
         android:layout_width="match_parent"

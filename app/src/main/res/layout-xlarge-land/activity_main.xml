@@ -5,11 +5,10 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
     tools:context="ratajczak.artur.vob.MainActivity">
-
     <fragment
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:name="ratajczak.artur.vob.fragments.BatmanVillainsCharacterListFragment"
+        android:name="ratajczak.artur.vob.fragments.VillainsOfBatmanListFragment"
         android:id="@+id/BVCFragment"
         android:layout_weight="1"
         tools:layout="@layout/fragment_batman_villains_character_list" />
@@ -17,8 +16,5 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:id="@+id/DetailsFragment"
-        android:layout_weight="1"
-        />
-
-
+        android:layout_weight="1"/>
 </LinearLayout>

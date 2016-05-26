@@ -7,12 +7,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 
 import android.net.ConnectivityManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-import ratajczak.artur.vob.RV.ArticleItemViewHolder;
 import ratajczak.artur.vob.RV.ArticleModel;
 import ratajczak.artur.vob.RV.ArticleRVAdapter;
 import ratajczak.artur.vob.utils.JsonParser;
@@ -38,31 +35,30 @@ import ratajczak.artur.bvc.R;
 /**
  * Created by Artur Ratajczak on 23.05.16.
  */
-public class BatmanVillainsCharacterListFragment extends Fragment implements SearchView.OnQueryTextListener,JsonParser.JsonParserResponse, ArticleItemViewHolder.ViewHolderClicks{
+public class VillainsOfBatmanListFragment extends Fragment implements SearchView.OnQueryTextListener,JsonParser.JsonParserResponse, ArticleRVAdapter.ViewHolderClicks {
     private RecyclerView recyclerView;
     private List<ArticleModel> articleModelList;
     private ArticleRVAdapter adapter;
     private boolean sortedAlphabetically = false;
-    private BVCListListener mClickListener;
+    private boolean showLiked = false;
+    private VOBActionsListener mClickListener;
 
-    public static interface BVCListListener{
-        void itemClicked(ArticleModel articleModel);
+    public interface VOBActionsListener{
+        void onCardClicked(ArticleModel articleModel);
+        void likeArticle(int articleID);
+        void unlikeArticle(int articleID);
     }
 
-    public BatmanVillainsCharacterListFragment() {
+    public VillainsOfBatmanListFragment() {
         // Required empty public constructor
     }
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_batman_villains_character_list, container, false);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-
         articleModelList = new ArrayList<>();
-
         recyclerView = (RecyclerView)view.findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
@@ -74,7 +70,7 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
         setHasOptionsMenu(true);
 
         if(isNetworkConnected()){
-            AsyncTask jsonParser = new JsonParser(this).execute();
+            new JsonParser(this).execute();
         }else{
             new AlertDialog.Builder(getContext())
                     .setTitle("Error")
@@ -91,15 +87,13 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
         recyclerView.setAdapter(adapter);
     }
 
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
         Activity activity;
         if(context instanceof Activity){
             activity = (Activity)context;
-         this.mClickListener = (BVCListListener)activity;
+         this.mClickListener = (VOBActionsListener)activity;
         }
     }
 
@@ -117,7 +111,6 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setOnQueryTextListener(this);
 
-
         MenuItemCompat.setOnActionExpandListener(item,
                 new MenuItemCompat.OnActionExpandListener() {
                     @Override
@@ -128,8 +121,7 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
 
                     @Override
                     public boolean onMenuItemActionExpand(MenuItem item) {
-                        // Do something when expanded
-                        return true; // Return true to expand action view
+                        return true;
                     }
                 });
     }
@@ -140,18 +132,26 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
             case R.id.menu_sort :
                 if(!sortedAlphabetically){
                     adapter.sortAlphabetically();
-                    sortedAlphabetically = true;
-                    }else{
+                   }else{
                     adapter.reverseOrder();
-                    sortedAlphabetically = false;
-                }
+                   }
+                sortedAlphabetically = !sortedAlphabetically;
                 return true;
             case R.id.menu_refresh :
                 articleModelList.clear();
-                AsyncTask jsonParser = new JsonParser(this).execute();
+                new JsonParser(this).execute();
+                return true;
+            case R.id.menu_liked :
+                if(!showLiked){
+                    adapter.showLiked();
+                    item.setTitle("Show all");
+                }else{
+                    adapter.setFilter(articleModelList);
+                    item.setTitle("Liked");
+                }
+                showLiked = !showLiked;
                 return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -168,8 +168,8 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
     }
 
     private void startFilter(String query){
-        List<ArticleModel> filtredArticles = filter(articleModelList,query);
-        adapter.setFilter(filtredArticles);
+        List<ArticleModel> filteredArticles = filter(articleModelList,query);
+        adapter.setFilter(filteredArticles);
     }
 
     private List<ArticleModel> filter(List<ArticleModel> articles, String query){
@@ -188,19 +188,30 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
         return cm.getActiveNetworkInfo() != null;
     }
 
-
     @Override
-    public void processFinish(ArticleModel articleModels) {
+    public void taskFinished(ArticleModel articleModels) {
         articleModelList.add(articleModels);
         adapter.notifyDataSetChanged();
     }
 
     @Override
-    public void onCardClick(View v) {
+    public void onCardClick(int position) {
         if(mClickListener!=null){
-        int pos = recyclerView.getChildAdapterPosition(v);
-        ArticleModel model = adapter.getArticleModeAt(pos);
-        mClickListener.itemClicked(model);
+        ArticleModel model = adapter.getArticleModeAt(position);
+        mClickListener.onCardClicked(model);
+        }
+    }
+
+    @Override
+    public void onLikeClick(int position) {
+        if(mClickListener!=null){
+            ArticleModel model = adapter.getArticleModeAt(position);
+            model.setLiked(!model.isLiked());
+            if(model.isLiked()){
+                mClickListener.likeArticle(model.getID());
+            }else{
+                mClickListener.unlikeArticle(model.getID());
+            }
         }
     }
 }
