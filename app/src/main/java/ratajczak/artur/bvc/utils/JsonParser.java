@@ -1,4 +1,4 @@
-package ratajczak.artur.bvc;
+package ratajczak.artur.bvc.utils;
 
 import android.os.AsyncTask;
 import android.util.Log;

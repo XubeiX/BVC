@@ -31,7 +31,12 @@ public class ArticleModel implements Comparable<ArticleModel> {
         return thumbnailUrl;
     }
 
+    public String getArticleURL() {
+        return articleURL;
+    }
+
     @Override
+
     public int compareTo(ArticleModel another) {
         int compare = this.title.compareTo(another.getTitle());
         return compare == 0 ? this.title.compareTo(another.getTitle()) : compare;

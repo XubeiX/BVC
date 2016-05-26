@@ -1,9 +1,11 @@
 package ratajczak.artur.bvc.fragments;
 
 
+import android.app.Activity;
+
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
+
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -21,16 +22,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ratajczak.artur.bvc.DetailActivity;
+
 import ratajczak.artur.bvc.RV.ArticleItemViewHolder;
 import ratajczak.artur.bvc.RV.ArticleModel;
 import ratajczak.artur.bvc.RV.ArticleRVAdapter;
-import ratajczak.artur.bvc.JsonParser;
+import ratajczak.artur.bvc.utils.JsonParser;
 import ratajczak.artur.bvc.R;
 
 /**
@@ -41,6 +42,12 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
     private List<ArticleModel> articleModelList;
     private ArticleRVAdapter adapter;
     private boolean sortedAlphabetically = false;
+    private BVCListListener mClickListener;
+
+    public static interface BVCListListener{
+        void itemClicked(ArticleModel articleModel);
+    }
+
     public BatmanVillainsCharacterListFragment() {
         // Required empty public constructor
     }
@@ -81,11 +88,25 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
         }
-
-        //TODO: in this place download data from server and store it in ArrayList "articleModelList" and create adapter
-
         adapter = new ArticleRVAdapter(articleModelList, this);
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        Activity activity;
+        if(context instanceof Activity){
+            activity = (Activity)context;
+         this.mClickListener = (BVCListListener)activity;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mClickListener = null;
     }
 
     @Override
@@ -172,16 +193,10 @@ public class BatmanVillainsCharacterListFragment extends Fragment implements Sea
 
     @Override
     public void onCardClick(View v) {
+        if(mClickListener!=null){
         int pos = recyclerView.getChildAdapterPosition(v);
         ArticleModel model = adapter.getArticleModeAt(pos);
-
-        Intent intent = new Intent(getActivity(), DetailActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString(DetailCharacterFragment.BUNDLE_TITLE_TAG, model.getTitle());
-        bundle.putString(DetailCharacterFragment.BUNDLE_ABSTRACT_TAG,model.getAbst());
-        intent.putExtras(bundle);
-        startActivity(intent);
-
-        Toast.makeText(getContext(),String.valueOf(pos),Toast.LENGTH_LONG).show();
+        mClickListener.itemClicked(model);
+        }
     }
 }

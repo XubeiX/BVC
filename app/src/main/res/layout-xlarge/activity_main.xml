@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="ratajczak.artur.bvc.MainActivity">
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/DetailsFragment"
+        android:layout_weight="1"
+        />
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="ratajczak.artur.bvc.fragments.BatmanVillainsCharacterListFragment"
+        android:id="@+id/BVCFragment"
+        android:layout_weight="1"
+        tools:layout="@layout/fragment_batman_villains_character_list" />
+
+</LinearLayout>

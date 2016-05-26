@@ -5,12 +5,9 @@
     android:layout_height="match_parent"
     tools:context="ratajczak.artur.bvc.DetailActivity">
 
-    <fragment
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="ratajczak.artur.bvc.fragments.DetailCharacterFragment"
-        android:id="@+id/DetailFragment"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        tools:layout="@layout/fragment_detail_character" />
+        android:id="@+id/DetailsFragment"
+        />
 </RelativeLayout>
