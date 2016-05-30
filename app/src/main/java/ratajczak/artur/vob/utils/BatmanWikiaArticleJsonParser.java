@@ -1,6 +1,7 @@
 package ratajczak.artur.vob.utils;
 
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -23,14 +24,14 @@ import ratajczak.artur.vob.RV.ArticleModel;
  * Created by Artur Ratajczak on 23.05.16.
  */
 
-public class JsonParser extends AsyncTask<String, Void, String>{
+public class BatmanWikiaArticleJsonParser extends AsyncTask<String, Void, Void>{
 
     public interface JsonParserResponse{
-        void taskFinished(ArticleModel articleModels);
+        void ArticleParsed(ArticleModel articleModels);
 
     }
 
-    private static final String TAG = "JsonParser";
+    private static final String TAG = "BWAJsonParser";
 
     //base url
     private static final String URL = "http://batman.wikia.com/api/v1/Articles/Top?expand=1";
@@ -49,15 +50,15 @@ public class JsonParser extends AsyncTask<String, Void, String>{
     private final String urlToParse;
     private final JsonParserResponse delegate;
 
-    public JsonParser(JsonParserResponse delegate){
+    public BatmanWikiaArticleJsonParser(JsonParserResponse delegate){
         this.delegate = delegate;
         urlToParse = URL + CATEGORY + LIMIT;
     }
 
     @Override
-    protected String doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
         InputStream inputStream;
-        StringBuilder JsonString = new StringBuilder();
+        StringBuilder batmanArticlesJSON = new StringBuilder();
 
         try {
             URL url = new URL(urlToParse);
@@ -72,30 +73,28 @@ public class JsonParser extends AsyncTask<String, Void, String>{
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"utf-8"));
             String line;
             while((line = bufferedReader.readLine()) != null){
-                JsonString.append(line).append("\n");
+                batmanArticlesJSON.append(line).append("\n");
             }
         }catch (IOException e){
             Log.e(TAG,e.getMessage());
             e.printStackTrace();
         }
 
-        return JsonString.toString();
+        startParallelJsonParser(batmanArticlesJSON.toString());
+        return null;
     }
 
-    @Override
-    protected void onPostExecute(String result) {
+    private void startParallelJsonParser(String jsonString){
         try {
-            JSONObject jsonObject = new JSONObject(result);
+            JSONObject jsonObject = new JSONObject(jsonString);
             JSONArray jsonArray = jsonObject.getJSONArray(TAG_ARRAY_ITEMS);
             for (int i = 0; i<jsonArray.length(); i++){
-                /*String title = jsonArray.getJSONObject(i).getString(TAG_TITLE);
-                String abst = jsonArray.getJSONObject(i).getString(TAG_ABSTRACT);
-                String thumbnail = jsonArray.getJSONObject(i).getString(TAG_THUMBNAIL);
-                String articleUrl = jsonArray.getJSONObject(i).getString(TAG_ARTICLE_URL);
-
-                ArticleModel model = new ArticleModel(title,abst,thumbnail,articleUrl);
-                delegate.processFinish(model);*/
-                new parseJSON().execute(jsonArray.getJSONObject(i));
+                JSONObject singleArticle = jsonArray.getJSONObject(i);
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+                    new parseBatmanArticleJSON().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,singleArticle);
+                }else{
+                    new parseBatmanArticleJSON().execute(singleArticle);
+                }
             }
         }catch (JSONException e){
             Log.e(TAG,e.getMessage());
@@ -103,7 +102,8 @@ public class JsonParser extends AsyncTask<String, Void, String>{
         }
     }
 
-    private class parseJSON extends AsyncTask<JSONObject,Void,ArticleModel>{
+
+    private class parseBatmanArticleJSON extends AsyncTask<JSONObject,Void,ArticleModel>{
 
         @Override
         protected ArticleModel doInBackground(JSONObject... params) {
@@ -126,7 +126,7 @@ public class JsonParser extends AsyncTask<String, Void, String>{
         @Override
         protected void onPostExecute(ArticleModel articleModel) {
             if(articleModel!=null)
-                delegate.taskFinished(articleModel);
+                delegate.ArticleParsed(articleModel);
         }
     }
 }

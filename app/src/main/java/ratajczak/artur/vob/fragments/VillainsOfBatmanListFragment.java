@@ -29,13 +29,13 @@ import java.util.List;
 
 import ratajczak.artur.vob.RV.ArticleModel;
 import ratajczak.artur.vob.RV.ArticleRVAdapter;
-import ratajczak.artur.vob.utils.JsonParser;
+import ratajczak.artur.vob.utils.BatmanWikiaArticleJsonParser;
 import ratajczak.artur.bvc.R;
 
 /**
  * Created by Artur Ratajczak on 23.05.16.
  */
-public class VillainsOfBatmanListFragment extends Fragment implements SearchView.OnQueryTextListener,JsonParser.JsonParserResponse, ArticleRVAdapter.ViewHolderClicks {
+public class VillainsOfBatmanListFragment extends Fragment implements SearchView.OnQueryTextListener,BatmanWikiaArticleJsonParser.JsonParserResponse, ArticleRVAdapter.ViewHolderClicks {
     private RecyclerView recyclerView;
     private List<ArticleModel> articleModelList;
     private ArticleRVAdapter adapter;
@@ -70,7 +70,7 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
         setHasOptionsMenu(true);
 
         if(isNetworkConnected()){
-            new JsonParser(this).execute();
+            new BatmanWikiaArticleJsonParser(this).execute();
         }else{
             new AlertDialog.Builder(getContext())
                     .setTitle("Error")
@@ -139,7 +139,7 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
                 return true;
             case R.id.menu_refresh :
                 articleModelList.clear();
-                new JsonParser(this).execute();
+                new BatmanWikiaArticleJsonParser(this).execute();
                 return true;
             case R.id.menu_liked :
                 if(!showLiked){
@@ -189,7 +189,7 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
     }
 
     @Override
-    public void taskFinished(ArticleModel articleModels) {
+    public void ArticleParsed(ArticleModel articleModels) {
         articleModelList.add(articleModels);
         adapter.notifyDataSetChanged();
     }
