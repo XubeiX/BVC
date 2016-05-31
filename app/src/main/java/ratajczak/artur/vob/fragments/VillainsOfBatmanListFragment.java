@@ -2,16 +2,11 @@ package ratajczak.artur.vob.fragments;
 
 
 import android.app.Activity;
-
 import android.content.Context;
-import android.content.DialogInterface;
-
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -22,20 +17,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
-
 import ratajczak.artur.vob.RV.ArticleModel;
 import ratajczak.artur.vob.RV.ArticleRVAdapter;
-import ratajczak.artur.vob.utils.BatmanWikiaArticleJsonParser;
 import ratajczak.artur.bvc.R;
 
 /**
  * Created by Artur Ratajczak on 23.05.16.
  */
-public class VillainsOfBatmanListFragment extends Fragment implements SearchView.OnQueryTextListener,BatmanWikiaArticleJsonParser.JsonParserResponse, ArticleRVAdapter.ViewHolderClicks {
+public class VillainsOfBatmanListFragment extends Fragment implements SearchView.OnQueryTextListener, ArticleRVAdapter.ViewHolderClicks {
     private RecyclerView recyclerView;
     private List<ArticleModel> articleModelList;
     private ArticleRVAdapter adapter;
@@ -47,6 +39,7 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
         void onCardClicked(ArticleModel articleModel);
         void likeArticle(int articleID);
         void unlikeArticle(int articleID);
+        void refreshList();
     }
 
     public VillainsOfBatmanListFragment() {
@@ -69,20 +62,6 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
 
-        if(isNetworkConnected()){
-            new BatmanWikiaArticleJsonParser(this).execute();
-        }else{
-            new AlertDialog.Builder(getContext())
-                    .setTitle("Error")
-                    .setMessage("No Internet access")
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // continue with delete
-                        }
-                    })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
-        }
         adapter = new ArticleRVAdapter(articleModelList, this);
         recyclerView.setAdapter(adapter);
     }
@@ -93,7 +72,11 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
         Activity activity;
         if(context instanceof Activity){
             activity = (Activity)context;
-         this.mClickListener = (VOBActionsListener)activity;
+            try {
+                this.mClickListener = (VOBActionsListener) activity;
+            }catch (ClassCastException e){
+                throw new ClassCastException(activity.toString() + " must implement VOBActionListener");
+            }
         }
     }
 
@@ -121,6 +104,8 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
 
                     @Override
                     public boolean onMenuItemActionExpand(MenuItem item) {
+                        showLiked = false;
+                        sortedAlphabetically = false;
                         return true;
                     }
                 });
@@ -139,7 +124,7 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
                 return true;
             case R.id.menu_refresh :
                 articleModelList.clear();
-                new BatmanWikiaArticleJsonParser(this).execute();
+                mClickListener.refreshList();
                 return true;
             case R.id.menu_liked :
                 if(!showLiked){
@@ -150,6 +135,7 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
                     item.setTitle("Liked");
                 }
                 showLiked = !showLiked;
+                sortedAlphabetically = false;
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -183,28 +169,19 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
         return filteredList;
     }
 
-    private boolean isNetworkConnected(){
-        ConnectivityManager cm = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        return cm.getActiveNetworkInfo() != null;
-    }
-
-    @Override
-    public void ArticleParsed(ArticleModel articleModels) {
+    public void addArticle(ArticleModel articleModels) {
         articleModelList.add(articleModels);
         adapter.notifyDataSetChanged();
     }
 
     @Override
     public void onCardClick(int position) {
-        if(mClickListener!=null){
         ArticleModel model = adapter.getArticleModeAt(position);
         mClickListener.onCardClicked(model);
-        }
     }
 
     @Override
     public void onLikeClick(int position) {
-        if(mClickListener!=null){
             ArticleModel model = adapter.getArticleModeAt(position);
             model.setLiked(!model.isLiked());
             if(model.isLiked()){
@@ -212,6 +189,5 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
             }else{
                 mClickListener.unlikeArticle(model.getID());
             }
-        }
     }
 }

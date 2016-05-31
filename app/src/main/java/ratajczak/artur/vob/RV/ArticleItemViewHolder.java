@@ -15,7 +15,6 @@ import ratajczak.artur.bvc.R;
  * Created by Artur Ratajczak on 23.05.16.
  */
 public class ArticleItemViewHolder extends RecyclerView.ViewHolder {
-    private final int MAXABSTRACTWORDS = 7;
     private View view;
     private TextView article_title;
     private TextView article_abstract;
@@ -35,23 +34,9 @@ public class ArticleItemViewHolder extends RecyclerView.ViewHolder {
 
     public void bind(ArticleModel articleModel){
         article_title.setText(articleModel.getTitle());
-        try{
-            //article_abstract.setText(getNFirstWords(articleModel.getAbst(),MAXABSTRACTWORDS));
-            article_abstract.setText(articleModel.getAbst());
-        }catch (Exception e){
-            article_abstract.setText(articleModel.getAbst());
-        }
+        article_abstract.setText(articleModel.getAbst());
         Picasso.with(context).load(articleModel.getThumbnailUrl()).error(R.drawable.batman).into(thumbnail);
         liked.setChecked(articleModel.isLiked());
-    }
-
-    private String getNFirstWords(String sentence, int n){
-        String[] words = sentence.split("\\s+");
-        StringBuilder sb = new StringBuilder();
-        for(int i =0; i < n; i++){
-            sb.append(words[i]).append(" ");
-        }
-        return sb.toString()+"...";
     }
 
     public void setOnClickListener(View.OnClickListener onClickListener){

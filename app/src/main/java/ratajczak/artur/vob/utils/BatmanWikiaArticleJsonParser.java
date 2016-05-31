@@ -28,7 +28,6 @@ public class BatmanWikiaArticleJsonParser extends AsyncTask<String, Void, Void>{
 
     public interface JsonParserResponse{
         void ArticleParsed(ArticleModel articleModels);
-
     }
 
     private static final String TAG = "BWAJsonParser";
