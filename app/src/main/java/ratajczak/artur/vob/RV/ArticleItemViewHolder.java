@@ -7,6 +7,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.mikhaellopez.circularimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 
 import ratajczak.artur.bvc.R;
@@ -18,7 +19,7 @@ public class ArticleItemViewHolder extends RecyclerView.ViewHolder {
     private View view;
     private TextView article_title;
     private TextView article_abstract;
-    private ImageView thumbnail;
+    private CircularImageView thumbnail;
     private CheckBox liked;
     private Context context;
 
@@ -28,7 +29,7 @@ public class ArticleItemViewHolder extends RecyclerView.ViewHolder {
         context = itemView.getContext();
         article_title = (TextView)itemView.findViewById(R.id.article_title);
         article_abstract = (TextView)itemView.findViewById(R.id.article_abstract);
-        thumbnail = (ImageView)itemView.findViewById(R.id.thumbnail);
+        thumbnail = (CircularImageView)itemView.findViewById(R.id.thumbnail);
         liked = (CheckBox)itemView.findViewById(R.id.like);
     }
 

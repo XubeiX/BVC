@@ -20,10 +20,14 @@ import ratajczak.artur.vob.fragments.VillainsOfBatmanListFragment;
 import ratajczak.artur.vob.fragments.DetailCharacterFragment;
 import ratajczak.artur.vob.utils.BatmanWikiaArticleJsonParser;
 import ratajczak.artur.vob.utils.DatabaseHelper;
+import ratajczak.artur.vob.utils.DatabaseManager;
 
 public class MainActivity extends AppCompatActivity implements VillainsOfBatmanListFragment.VOBActionsListener, BatmanWikiaArticleJsonParser.JsonParserResponse {
 
+    static final String STATE_SAVE_BUNDLE = "bundle";
+
     private DatabaseHelper dataBase;
+    private DatabaseManager databaseManager;
     private VillainsOfBatmanListFragment ListFragmentContainer;
     private View DetailsFragmentContainer;
     private Bundle bundle;
@@ -37,9 +41,14 @@ public class MainActivity extends AppCompatActivity implements VillainsOfBatmanL
         ListFragmentContainer = (VillainsOfBatmanListFragment)getSupportFragmentManager().findFragmentById(R.id.BVCFragment);
 
         dataBase = new DatabaseHelper(this);
+        DatabaseManager.initializeInstance(dataBase);
+        databaseManager = DatabaseManager.getInstance();
 
         if(DetailsFragmentContainer!=null){
-            bundle = prepareBundle(welcomeArticle());
+            if(savedInstanceState!=null)
+                bundle = savedInstanceState.getBundle(STATE_SAVE_BUNDLE);
+            else
+                bundle = prepareBundle(welcomeArticle());
             updateDetailCharacterFragment(bundle);
         }
     }
@@ -65,7 +74,11 @@ public class MainActivity extends AppCompatActivity implements VillainsOfBatmanL
         }
     }
 
-
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBundle(STATE_SAVE_BUNDLE,bundle);
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     public void onCardClicked(ArticleModel articleModel) {
@@ -82,19 +95,16 @@ public class MainActivity extends AppCompatActivity implements VillainsOfBatmanL
 
     @Override
     public void likeArticle(int articleID) {
-          dataBase.insertArticle(articleID);
+       databaseManager.insertArticle(articleID);
     }
 
     @Override
     public void unlikeArticle(int articleID) {
-        dataBase.deleteArticle(articleID);
+        databaseManager.deleteArticle(articleID);
     }
 
     @Override
     public void ArticleParsed(ArticleModel articleModels) {
-        //TODO:ten sposób zawiesza UI (należy sprawdzać w wątku czy artykuł jest ulubiony (baza danych musi zezwolić na wiele połączeń))
-        //if(dataBase.articleIsLiked(articleModels.getID()))
-        //    articleModels.setLiked(true);
         ListFragmentContainer.addArticle(articleModels);
     }
 

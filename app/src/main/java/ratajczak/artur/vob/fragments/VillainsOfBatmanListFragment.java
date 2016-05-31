@@ -171,7 +171,8 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
 
     public void addArticle(ArticleModel articleModels) {
         articleModelList.add(articleModels);
-        adapter.notifyDataSetChanged();
+        //adapter.notifyDataSetChanged();
+        adapter.notifyItemInserted(articleModelList.indexOf(articleModels));
     }
 
     @Override

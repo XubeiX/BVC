@@ -103,10 +103,10 @@ public class BatmanWikiaArticleJsonParser extends AsyncTask<String, Void, Void>{
 
 
     private class parseBatmanArticleJSON extends AsyncTask<JSONObject,Void,ArticleModel>{
-
+        private DatabaseManager manager;
         @Override
         protected ArticleModel doInBackground(JSONObject... params) {
-            ArticleModel model = null;
+                       ArticleModel model = null;
             try {
                 JSONObject object = params[0];
                 String title = object.getString(TAG_TITLE);
@@ -115,7 +115,14 @@ public class BatmanWikiaArticleJsonParser extends AsyncTask<String, Void, Void>{
                 String articleUrl = object.getString(TAG_ARTICLE_URL);
                 int ID = object.getInt(TAG_ID);
                 model = new ArticleModel(ID,title,abst,thumbnail,articleUrl);
+                manager = DatabaseManager.getInstance();
+                if(manager.articleIsLiked(ID))
+                    model.setLiked(true);
+
             }catch (JSONException e){
+                Log.e(TAG,e.getMessage());
+                e.printStackTrace();
+            }catch (IllegalStateException e){
                 Log.e(TAG,e.getMessage());
                 e.printStackTrace();
             }

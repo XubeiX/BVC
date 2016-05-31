@@ -31,29 +31,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
 
-    public boolean insertArticle(int ArticleID){
-        SQLiteDatabase db = this.getWritableDatabase();
+    public boolean insertArticle(SQLiteDatabase db,int ArticleID){
         ContentValues contentValues = new ContentValues();
         contentValues.put(ARTICLES_COLUMN_ARTICLE_ID, ArticleID);
         long id = db.insert(ARTICLES_TABLE_NAME,null,contentValues);
-        db.close();
         return id != -1;
     }
 
-    public void deleteArticle(int ArticleID){
-        SQLiteDatabase db = this.getReadableDatabase();
+    public void deleteArticle(SQLiteDatabase db, int ArticleID){
         db.delete(ARTICLES_TABLE_NAME,ARTICLES_COLUMN_ARTICLE_ID + " = ? ",new String[]{Integer.toString(ArticleID)});
-        db.close();
     }
 
-    public boolean articleIsLiked(int articleID){
+    public boolean articleIsLiked(SQLiteDatabase db,int articleID){
         boolean inDatabase = false;
-        SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + ARTICLES_TABLE_NAME + " where " + ARTICLES_COLUMN_ARTICLE_ID + " = " + articleID,null);
         if(cursor.getCount()>0) {
             inDatabase = true;
         }
-        db.close();
         cursor.close();
         return inDatabase;
     }
