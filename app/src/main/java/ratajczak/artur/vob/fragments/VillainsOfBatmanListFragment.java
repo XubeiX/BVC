@@ -124,7 +124,10 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
                 return true;
             case R.id.menu_refresh :
                 articleModelList.clear();
+                adapter.notifyDataSetChanged();
                 mClickListener.refreshList();
+                sortedAlphabetically = false;
+                showLiked = false;
                 return true;
             case R.id.menu_liked :
                 if(!showLiked){
@@ -171,7 +174,6 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
 
     public void addArticle(ArticleModel articleModels) {
         articleModelList.add(articleModels);
-        //adapter.notifyDataSetChanged();
         adapter.notifyItemInserted(articleModelList.indexOf(articleModels));
     }
 
