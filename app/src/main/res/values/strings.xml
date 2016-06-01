@@ -1,13 +1,16 @@
 <resources>
-    <string name="app_name">Villains of Batman</string>
+    <string name="app_name" translatable="false">Villains of Batman</string>
     <string name="thumbnail">Thumbnail</string>
     <string name="action_search">Search</string>
     <string name="action_sort">Sort</string>
     <string name="readMoreButton">Read more on Wiki</string>
-    <string name="detailsFragmentWelcom">Villains of Batman</string>
+    <string name="detailsFragmentWelcom" translatable="false">Villains of Batman</string>
     <string name="detailsFragmentAbstract">Choose a character from the list.</string>
     <string name="like">Like</string>
     <string name="liked">Liked</string>
     <string name="refresh">Refresh</string>
-
+    <string name="internet_access_error">Error</string>
+    <string name="internet_error_message">No Internet connection</string>
+    <string name="menu_showLiked">Liked</string>
+    <string name="menu_showAll">Show all</string>
 </resources>

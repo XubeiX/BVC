@@ -3,7 +3,7 @@ package ratajczak.artur.vob.utils;
 import android.database.sqlite.SQLiteDatabase;
 
 /**
- * Created by xubeix on 31.05.16.
+ * Created by Artur Ratajczak on 31.05.16.
  */
 public class DatabaseManager {
     private int mOpenConnection;
@@ -27,19 +27,19 @@ public class DatabaseManager {
     }
 
     public boolean articleIsLiked(int articleID){
-      boolean isLiked = mDatabaseHelper.articleIsLiked(openDatabase(),articleID);
+        boolean isLiked = mDatabaseHelper.articleIsLiked(openDatabase(), articleID);
         closeDatabase();
-      return isLiked;
+        return isLiked;
     }
 
     public boolean insertArticle(int articleID){
-        boolean success = mDatabaseHelper.insertArticle(openDatabase(),articleID);
+        boolean success = mDatabaseHelper.insertArticle(openDatabase(), articleID);
         closeDatabase();
         return success;
     }
 
     public void deleteArticle(int articleID){
-        mDatabaseHelper.deleteArticle(openDatabase(),articleID);
+        mDatabaseHelper.deleteArticle(openDatabase(), articleID);
         closeDatabase();
     }
 

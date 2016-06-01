@@ -1,12 +1,12 @@
 package ratajczak.artur.vob.fragments;
 
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -34,6 +34,7 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
     private boolean sortedAlphabetically = false;
     private boolean showLiked = false;
     private VOBActionsListener mClickListener;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public interface VOBActionsListener{
         void onCardClicked(ArticleModel articleModel);
@@ -55,6 +56,19 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
         recyclerView = (RecyclerView)view.findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
+        swipeRefreshLayout = (SwipeRefreshLayout)view.findViewById(R.id.swipe_refresh_layout_fragment_BVCList);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if(showLiked == false){
+                    articleModelList.clear();
+                    adapter.notifyDataSetChanged();
+                    sortedAlphabetically = false;
+                    mClickListener.refreshList();
+                }
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
         return view;
     }
 
@@ -99,7 +113,7 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
                     @Override
                     public boolean onMenuItemActionCollapse(MenuItem item) {
                         adapter.setFilter(articleModelList);
-                        return true; // Return true to collapse action view
+                        return true;
                     }
 
                     @Override
@@ -122,20 +136,13 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
                    }
                 sortedAlphabetically = !sortedAlphabetically;
                 return true;
-            case R.id.menu_refresh :
-                articleModelList.clear();
-                adapter.notifyDataSetChanged();
-                mClickListener.refreshList();
-                sortedAlphabetically = false;
-                showLiked = false;
-                return true;
             case R.id.menu_liked :
                 if(!showLiked){
                     adapter.showLiked();
-                    item.setTitle("Show all");
+                    item.setTitle(getResources().getString(R.string.menu_showAll));
                 }else{
                     adapter.setFilter(articleModelList);
-                    item.setTitle("Liked");
+                    item.setTitle(getResources().getString(R.string.menu_showLiked));
                 }
                 showLiked = !showLiked;
                 sortedAlphabetically = false;
@@ -157,7 +164,7 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
     }
 
     private void startFilter(String query){
-        List<ArticleModel> filteredArticles = filter(articleModelList,query);
+        List<ArticleModel> filteredArticles = filter(articleModelList, query);
         adapter.setFilter(filteredArticles);
     }
 
@@ -174,7 +181,7 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
 
     public void addArticle(ArticleModel articleModels) {
         articleModelList.add(articleModels);
-        adapter.notifyItemInserted(articleModelList.indexOf(articleModels));
+        adapter.notifyDataSetChanged();
     }
 
     @Override

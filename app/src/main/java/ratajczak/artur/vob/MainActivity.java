@@ -36,8 +36,8 @@ public class MainActivity extends AppCompatActivity implements VillainsOfBatmanL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        DetailsFragmentContainer = findViewById(R.id.DetailsFragment);
 
+        DetailsFragmentContainer = findViewById(R.id.DetailsFragment);
         ListFragmentContainer = (VillainsOfBatmanListFragment)getSupportFragmentManager().findFragmentById(R.id.BVCFragment);
 
         dataBase = new DatabaseHelper(this);
@@ -45,26 +45,20 @@ public class MainActivity extends AppCompatActivity implements VillainsOfBatmanL
         databaseManager = DatabaseManager.getInstance();
 
         if(DetailsFragmentContainer!=null){
-            if(savedInstanceState!=null)
+            if(savedInstanceState!=null){
                 bundle = savedInstanceState.getBundle(STATE_SAVE_BUNDLE);
-            else
+            }else{
                 bundle = prepareBundle(welcomeArticle());
-            updateDetailCharacterFragment(bundle);
+            }
+        updateDetailCharacterFragment(bundle);
         }
-    }
-
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
         if(isNetworkConnected() && ListFragmentContainer!=null){
-            new BatmanWikiaArticleJsonParser(this).execute();
+           refreshList();
         }else{
             new AlertDialog.Builder(this)
-                    .setTitle("Error")
-                    .setMessage("No Internet access")
+                    .setTitle(getResources().getString(R.string.internet_access_error))
+                    .setMessage(getResources().getString(R.string.internet_error_message))
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                         }
@@ -73,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements VillainsOfBatmanL
                     .show();
         }
     }
+
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -112,7 +108,6 @@ public class MainActivity extends AppCompatActivity implements VillainsOfBatmanL
     public void refreshList() {
         new BatmanWikiaArticleJsonParser(this).execute();
     }
-
 
     private void updateDetailCharacterFragment(Bundle bundle){
         DetailCharacterFragment detailFragment = new DetailCharacterFragment();

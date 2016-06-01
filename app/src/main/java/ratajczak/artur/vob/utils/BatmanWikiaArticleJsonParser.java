@@ -12,10 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 
 import ratajczak.artur.vob.RV.ArticleModel;
@@ -24,7 +21,7 @@ import ratajczak.artur.vob.RV.ArticleModel;
  * Created by Artur Ratajczak on 23.05.16.
  */
 
-public class BatmanWikiaArticleJsonParser extends AsyncTask<String, Void, Void>{
+public class BatmanWikiaArticleJsonParser extends AsyncTask<Void, Void, Void>{
 
     public interface JsonParserResponse{
         void ArticleParsed(ArticleModel articleModels);
@@ -33,21 +30,21 @@ public class BatmanWikiaArticleJsonParser extends AsyncTask<String, Void, Void>{
     private static final String TAG = "BWAJsonParser";
 
     //base url
-    private static final String URL = "http://batman.wikia.com/api/v1/Articles/Top?expand=1";
+    private final String URL = "http://batman.wikia.com/api/v1/Articles/Top?expand=1";
     //urs parameters
-    private static final String CATEGORY = "&category=Villains";
-    private static final String LIMIT = "&limit=50";
+    private final String CATEGORY = "&category=Villains";
+    private final String LIMIT = "&limit=50";
 
     //JSON node name
-    private static final String TAG_ARRAY_ITEMS = "items";
-    private static final String TAG_TITLE = "title";
-    private static final String TAG_ABSTRACT = "abstract";
-    private static final String TAG_THUMBNAIL = "thumbnail";
-    private static final String TAG_ARTICLE_URL = "url";
-    private static final String TAG_ID = "id";
+    private final String TAG_ARRAY_ITEMS = "items";
+    private final String TAG_TITLE = "title";
+    private final String TAG_ABSTRACT = "abstract";
+    private final String TAG_THUMBNAIL = "thumbnail";
+    private final String TAG_ARTICLE_URL = "url";
+    private final String TAG_ID = "id";
 
-    private final String urlToParse;
-    private final JsonParserResponse delegate;
+    private String urlToParse;
+    private JsonParserResponse delegate;
 
     public BatmanWikiaArticleJsonParser(JsonParserResponse delegate){
         this.delegate = delegate;
@@ -55,7 +52,7 @@ public class BatmanWikiaArticleJsonParser extends AsyncTask<String, Void, Void>{
     }
 
     @Override
-    protected Void doInBackground(String... params) {
+    protected Void doInBackground(Void... params) {
         InputStream inputStream;
         StringBuilder batmanArticlesJSON = new StringBuilder();
 
@@ -67,15 +64,16 @@ public class BatmanWikiaArticleJsonParser extends AsyncTask<String, Void, Void>{
             urlConnection.setDoInput(true);
             urlConnection.addRequestProperty("Content-Type","application/json; charset=utf-8");
             urlConnection.connect();
+
             inputStream = urlConnection.getInputStream();
 
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream,"utf-8"));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
             String line;
             while((line = bufferedReader.readLine()) != null){
                 batmanArticlesJSON.append(line).append("\n");
             }
         }catch (IOException e){
-            Log.e(TAG,e.getMessage());
+            Log.e(TAG, e.getMessage());
             e.printStackTrace();
         }
 
@@ -87,23 +85,23 @@ public class BatmanWikiaArticleJsonParser extends AsyncTask<String, Void, Void>{
         try {
             JSONObject jsonObject = new JSONObject(jsonString);
             JSONArray jsonArray = jsonObject.getJSONArray(TAG_ARRAY_ITEMS);
-            for (int i = 0; i<jsonArray.length(); i++){
+            for (int i = 0; i < jsonArray.length(); i++){
                 JSONObject singleArticle = jsonArray.getJSONObject(i);
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-                    new parseBatmanArticleJSON().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,singleArticle);
+                    new parseBatmanArticleJSON().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, singleArticle);
                 }else{
                     new parseBatmanArticleJSON().execute(singleArticle);
                 }
             }
         }catch (JSONException e){
-            Log.e(TAG,e.getMessage());
+            Log.e(TAG, e.getMessage());
             e.printStackTrace();
         }
     }
 
 
     private class parseBatmanArticleJSON extends AsyncTask<JSONObject,Void,ArticleModel>{
-        private DatabaseManager manager;
+
         @Override
         protected ArticleModel doInBackground(JSONObject... params) {
                        ArticleModel model = null;
@@ -115,15 +113,15 @@ public class BatmanWikiaArticleJsonParser extends AsyncTask<String, Void, Void>{
                 String articleUrl = object.getString(TAG_ARTICLE_URL);
                 int ID = object.getInt(TAG_ID);
                 model = new ArticleModel(ID,title,abst,thumbnail,articleUrl);
-                manager = DatabaseManager.getInstance();
-                if(manager.articleIsLiked(ID))
+
+                if(DatabaseManager.getInstance().articleIsLiked(ID))
                     model.setLiked(true);
 
             }catch (JSONException e){
-                Log.e(TAG,e.getMessage());
+                Log.e(TAG, e.getMessage());
                 e.printStackTrace();
             }catch (IllegalStateException e){
-                Log.e(TAG,e.getMessage());
+                Log.e(TAG, e.getMessage());
                 e.printStackTrace();
             }
             return model;

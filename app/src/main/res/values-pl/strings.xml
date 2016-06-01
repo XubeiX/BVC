@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_search">Szukaj</string>
+    <string name="action_sort">Sortuj</string>
+    <string name="detailsFragmentAbstract">Wybierz postać z listy.</string>
+    <string name="internet_access_error">Błąd</string>
+    <string name="internet_error_message">Brak dostępu do Internetu</string>
+    <string name="like">Lubię to!</string>
+    <string name="liked">Ulubione</string>
+    <string name="menu_showAll">Pokaż wszystkie</string>
+    <string name="menu_showLiked">Ulubione</string>
+    <string name="readMoreButton">Przeczytaj więcej na Wiki</string>
+    <string name="refresh">Odświerz</string>
+    <string name="thumbnail">Miniatura</string>
+</resources>
