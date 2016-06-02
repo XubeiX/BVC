@@ -87,11 +87,7 @@ public class BatmanWikiaArticleJsonParser extends AsyncTask<Void, Void, Void>{
             JSONArray jsonArray = jsonObject.getJSONArray(TAG_ARRAY_ITEMS);
             for (int i = 0; i < jsonArray.length(); i++){
                 JSONObject singleArticle = jsonArray.getJSONObject(i);
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-                    new parseBatmanArticleJSON().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, singleArticle);
-                }else{
                     new parseBatmanArticleJSON().execute(singleArticle);
-                }
             }
         }catch (JSONException e){
             Log.e(TAG, e.getMessage());

@@ -6,7 +6,6 @@ import android.os.Bundle;
 
 import ratajczak.artur.bvc.R;
 import ratajczak.artur.vob.fragments.DetailCharacterFragment;
-
 public class DetailActivity extends AppCompatActivity {
 
     @Override

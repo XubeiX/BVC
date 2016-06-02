@@ -6,20 +6,19 @@ import android.database.sqlite.SQLiteDatabase;
  * Created by Artur Ratajczak on 31.05.16.
  */
 public class DatabaseManager {
-    private int mOpenConnection;
 
     private static DatabaseManager mInstance;
     private static DatabaseHelper mDatabaseHelper;
     private SQLiteDatabase mDatabase;
 
-    public static synchronized void initializeInstance(DatabaseHelper helper){
+    public static void initializeInstance(DatabaseHelper helper){
         if(mInstance == null){
             mInstance = new DatabaseManager();
             mDatabaseHelper = helper;
         }
     }
 
-    public static synchronized DatabaseManager getInstance() throws IllegalStateException{
+    public static DatabaseManager getInstance() throws IllegalStateException{
         if(mInstance == null){
             throw new IllegalStateException(DatabaseManager.class.getName() + " is not initialized, call initializeInstance(...) method first.");
         }
@@ -28,34 +27,28 @@ public class DatabaseManager {
 
     public boolean articleIsLiked(int articleID){
         boolean isLiked = mDatabaseHelper.articleIsLiked(openDatabase(), articleID);
-        closeDatabase();
+        DatabaseManager.getInstance().closeDatabase();
         return isLiked;
     }
 
     public boolean insertArticle(int articleID){
         boolean success = mDatabaseHelper.insertArticle(openDatabase(), articleID);
-        closeDatabase();
+        DatabaseManager.getInstance().closeDatabase();
         return success;
     }
 
     public void deleteArticle(int articleID){
         mDatabaseHelper.deleteArticle(openDatabase(), articleID);
-        closeDatabase();
+        DatabaseManager.getInstance().closeDatabase();
     }
 
-    private synchronized SQLiteDatabase openDatabase(){
-        mOpenConnection++;
-        if(mOpenConnection == 1){
-            mDatabase = mDatabaseHelper.getWritableDatabase();
-        }
+    private SQLiteDatabase openDatabase(){
+        mDatabase = mDatabaseHelper.getWritableDatabase();
         return mDatabase;
     }
 
-    private synchronized void closeDatabase(){
-        mOpenConnection--;
-        if(mOpenConnection == 0){
+    public void closeDatabase(){
             mDatabase.close();
-        }
     }
 }
 
