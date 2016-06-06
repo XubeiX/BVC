@@ -13,4 +13,6 @@
     <string name="internet_error_message">No Internet connection</string>
     <string name="menu_showLiked">Liked</string>
     <string name="menu_showAll">Show all</string>
+    <string name="progress_title">Please Wait...</string>
+    <string name="progress_message">Downloading data...</string>
 </resources>

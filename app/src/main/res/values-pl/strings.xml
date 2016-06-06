@@ -12,4 +12,6 @@
     <string name="readMoreButton">Przeczytaj więcej na Wiki</string>
     <string name="refresh">Odświerz</string>
     <string name="thumbnail">Miniatura</string>
+    <string name="progress_message">Pobieranie danych...</string>
+    <string name="progress_title">Proczę czekać...</string>
 </resources>

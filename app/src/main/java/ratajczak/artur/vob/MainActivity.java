@@ -1,5 +1,6 @@
 package ratajczak.artur.vob;
 
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements VillainsOfBatmanL
 
     static final String STATE_SAVE_BUNDLE = "bundle";
 
+    private ProgressDialog progressDialog;
     private DatabaseHelper dataBase;
     private DatabaseManager databaseManager;
     private VillainsOfBatmanListFragment ListFragmentContainer;
@@ -36,6 +38,10 @@ public class MainActivity extends AppCompatActivity implements VillainsOfBatmanL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle(getResources().getString(R.string.progress_title));
+        progressDialog.setMessage(getResources().getString(R.string.progress_message));
 
         DetailsFragmentContainer = findViewById(R.id.DetailsFragment);
         ListFragmentContainer = (VillainsOfBatmanListFragment)getSupportFragmentManager().findFragmentById(R.id.BVCFragment);
@@ -53,22 +59,8 @@ public class MainActivity extends AppCompatActivity implements VillainsOfBatmanL
         updateDetailCharacterFragment(bundle);
         }
 
-        if(isNetworkConnected() && ListFragmentContainer!=null){
-           refreshList();
-        }else{
-            new AlertDialog.Builder(this)
-                    .setTitle(getResources().getString(R.string.internet_access_error))
-                    .setMessage(getResources().getString(R.string.internet_error_message))
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
-        }
+        refreshList();
     }
-
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -101,12 +93,27 @@ public class MainActivity extends AppCompatActivity implements VillainsOfBatmanL
 
     @Override
     public void ArticleParsed(ArticleModel articleModels) {
+        if(progressDialog.isShowing())
+            progressDialog.dismiss();
         ListFragmentContainer.addArticle(articleModels);
     }
 
     @Override
     public void refreshList() {
-        new BatmanWikiaArticleJsonParser(this).execute();
+        if(isNetworkConnected() && ListFragmentContainer!=null){
+            progressDialog.show();
+            new BatmanWikiaArticleJsonParser(this).execute();
+        }else{
+            new AlertDialog.Builder(this)
+                    .setTitle(getResources().getString(R.string.internet_access_error))
+                    .setMessage(getResources().getString(R.string.internet_error_message))
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
     }
 
     private void updateDetailCharacterFragment(Bundle bundle){
