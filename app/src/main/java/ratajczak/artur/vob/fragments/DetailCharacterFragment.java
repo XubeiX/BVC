@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,15 +59,23 @@ public class DetailCharacterFragment extends Fragment implements View.OnClickLis
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         bundle = getArguments();
         if(bundle!=null) {
-            title.setText(bundle.getString(BUNDLE_TITLE_TAG));
-            abst.setText(bundle.getString(BUNDLE_ABSTRACT_TAG));
-            liked.setChecked(bundle.getBoolean(BUNDLE_LIKED_TAG));
-            if((bundle.getString(BUNDLE_THUMBNAIL_URL) == null || bundle.getString(BUNDLE_ARTICLE_URL) == null)) {
-                Picasso.with(view.getContext()).load(R.drawable.batman).into(thumbnail);
-                readMoreBtn.setVisibility(View.INVISIBLE);
-            }else{
-                Picasso.with(view.getContext()).load(bundle.getString(BUNDLE_THUMBNAIL_URL)).error(R.drawable.batman).into(thumbnail);
-                readMoreBtn.setVisibility(View.VISIBLE);
+            try{
+                title.setText(bundle.getString(BUNDLE_TITLE_TAG));
+                abst.setText(bundle.getString(BUNDLE_ABSTRACT_TAG));
+                liked.setChecked(bundle.getBoolean(BUNDLE_LIKED_TAG));
+                if(bundle.getString(BUNDLE_THUMBNAIL_URL) != null){
+                    Picasso.with(view.getContext()).load(bundle.getString(BUNDLE_THUMBNAIL_URL)).error(R.drawable.batman).into(thumbnail);
+                    }else {
+                    Picasso.with(view.getContext()).load(R.drawable.batman).into(thumbnail);
+                    }
+                if(bundle.getString(BUNDLE_ARTICLE_URL) != null){
+                    readMoreBtn.setVisibility(View.VISIBLE);
+                    }else {
+                    readMoreBtn.setVisibility(View.INVISIBLE);
+                    }
+                }catch (NullPointerException e){
+                Log.e("DetailFragment",e.getMessage());
+                e.printStackTrace();
             }
         }
     }

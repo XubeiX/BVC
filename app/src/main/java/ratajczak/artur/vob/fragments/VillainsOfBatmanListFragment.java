@@ -163,6 +163,28 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
         return true;
     }
 
+    public void addArticle(ArticleModel articleModels) {
+        articleModelList.add(articleModels);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onCardClick(int position) {
+        ArticleModel model = adapter.getArticleModeAt(position);
+        mClickListener.onCardClicked(model);
+    }
+
+    @Override
+    public void onLikeClick(int position) {
+        ArticleModel model = adapter.getArticleModeAt(position);
+        model.setLiked(!model.isLiked());
+        if(model.isLiked()){
+            mClickListener.likeArticle(model.getID());
+        }else{
+            mClickListener.unlikeArticle(model.getID());
+        }
+    }
+
     private void startFilter(String query){
         List<ArticleModel> filteredArticles = filter(articleModelList, query);
         adapter.setFilter(filteredArticles);
@@ -177,27 +199,5 @@ public class VillainsOfBatmanListFragment extends Fragment implements SearchView
             }
         }
         return filteredList;
-    }
-
-    public void addArticle(ArticleModel articleModels) {
-        articleModelList.add(articleModels);
-        adapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onCardClick(int position) {
-        ArticleModel model = adapter.getArticleModeAt(position);
-        mClickListener.onCardClicked(model);
-    }
-
-    @Override
-    public void onLikeClick(int position) {
-            ArticleModel model = adapter.getArticleModeAt(position);
-            model.setLiked(!model.isLiked());
-            if(model.isLiked()){
-                mClickListener.likeArticle(model.getID());
-            }else{
-                mClickListener.unlikeArticle(model.getID());
-            }
     }
 }
